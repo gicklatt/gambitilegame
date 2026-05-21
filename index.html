@@ -86,6 +86,11 @@
       font-size: 14px; font-weight: 600;
       border: 1px solid var(--line); color: var(--faint);
     }
+    a.badge {
+      color: var(--text); border-color: var(--lime);
+      transition: transform .2s ease;
+    }
+    a.badge:hover { transform: translateY(-2px); }
 
     .shots {
       display: flex; gap: 16px; overflow-x: auto;
@@ -181,7 +186,7 @@
         morph your way through 100 hand-tuned chess-piece puzzles.
       </p>
       <div class="badges">
-        <span class="badge">App Store &middot; coming soon</span>
+        <a class="badge" href="https://apps.apple.com/us/app/gambitile/id6771101524" target="_blank" rel="noopener">App Store</a>
         <span class="badge">Google Play &middot; coming soon</span>
       </div>
     </section>
