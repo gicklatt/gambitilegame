@@ -13,8 +13,8 @@ puzzles, every one BFS-verified solvable, across five rising tiers from
 4×4 warm-ups to 8×8 boards with holes. Three-star ranks reward optimal
 solutions.
 
-No ads, no timers, no internet — designed for short, satisfying
-sessions in portrait, one-handed.
+No timers, no nudges — designed for short, satisfying sessions in
+portrait, one-handed. Optional rewarded videos earn hints and undos.
 
 ## Tech stack
 
@@ -49,10 +49,11 @@ GitHub Pages → **Settings → Pages → Deploy from a branch → `main` / root
 - Privacy Policy: `https://gicklatt.github.io/gambitilegame/privacy/`
 - Support / Marketing: `https://gicklatt.github.io/gambitilegame/`
 
-> Gambitile ships with **no ads**, so it needs no `app-ads.txt`. The
-> shared `app-ads.txt` lives in the
+> Gambitile uses Google AdMob; the shared `app-ads.txt` covering all
+> Gicklatt ad-supported games lives in the
 > [`gicklatt.github.io`](https://github.com/gicklatt/gicklatt.github.io)
-> repo and serves ad-supported games only.
+> repo (it is served from the root domain so AdMob's crawler finds it
+> for every store listing).
 
 ---
 
