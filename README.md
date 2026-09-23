@@ -8,18 +8,18 @@ a game by [Gicklatt](https://gicklatt.github.io).
 ## About the game
 
 Become the piece you step on. Tap to move as a rook, step onto a knight
-tile, and now you move like a knight. 100 deterministic chess-piece
-puzzles, every one BFS-verified solvable, across five rising tiers from
-4×4 warm-ups to 8×8 boards with holes. Three-star ranks reward optimal
+tile, and now you move like a knight. 500 fixed chess-piece
+puzzles with verified solutions, across 25 collections.
+Three-star ranks reward optimal
 solutions.
 
 No timers, no nudges — designed for short, satisfying sessions in
-portrait, one-handed. Optional rewarded videos earn hints and undos.
+portrait, one-handed. Undo is free and unlimited. Optional rewarded videos offer extra hints.
 
 ## Tech stack
 
 - Plain static **HTML + CSS** — no build step
-- Fonts: Press Start 2P + Inter (Google Fonts)
+- Fonts: locally hosted Fredoka + Inter (licenses in assets/fonts)
 - Hosted on **GitHub Pages**
 
 ## Structure

@@ -1,263 +1,68 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gambitile — Chess Morph Puzzle</title>
-  <meta name="description" content="Gambitile is a chess-morph puzzle. Step on a piece, become it, find the exit. 100 hand-tuned levels across five rising tiers, every one BFS-verified solvable." />
-  <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
-  <meta property="og:title" content="Gambitile — Chess Morph Puzzle" />
-  <meta property="og:description" content="Step on a piece, become it, find the exit. 100 hand-tuned puzzles, three-star ranks, optional rewarded hints." />
-  <meta property="og:image" content="assets/screenshots/01-tutorial.png" />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#0e2620" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0e2620;
-      --panel: #15362d;
-      --line: rgba(52, 211, 153, 0.14);
-      --text: #eef5ee;
-      --muted: #94ab9d;
-      --faint: #5a7568;
-      --emerald: #34d399;
-      --emerald-deep: #059669;
-      --mint: #a7f3d0;
-      --ease: cubic-bezier(.22, 1, .36, 1);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      line-height: 1.65;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    a { color: inherit; text-decoration: none; }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 26px; }
-
-    body::before {
-      content: ""; position: fixed; inset: 0; z-index: -1;
-      background:
-        radial-gradient(640px 460px at 86% -4%, rgba(52, 211, 153, 0.14), transparent 70%),
-        radial-gradient(640px 460px at 4% 100%, rgba(5, 150, 105, 0.18), transparent 70%);
-    }
-
-    header {
-      position: sticky; top: 0; z-index: 50;
-      backdrop-filter: blur(14px);
-      background: rgba(14, 38, 32, 0.78);
-      border-bottom: 1px solid transparent;
-      transition: border-color .3s var(--ease);
-    }
-    header.scrolled { border-bottom-color: var(--line); }
-    .nav { display: flex; align-items: center; justify-content: space-between; height: 66px; }
-    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: 0.04em; }
-    .brand img { width: 30px; height: 30px; border-radius: 7px; }
-    .brand .name { font-size: 14px; }
-    .nav-links { display: flex; gap: 26px; font-size: 14px; color: var(--muted); }
-    .nav-links a { transition: color .2s var(--ease); }
-    .nav-links a:hover { color: var(--text); }
-
-    .hero { text-align: center; padding: 92px 26px 56px; }
-    .hero .icon {
-      width: 100px; height: 100px; border-radius: 22px; margin-bottom: 26px;
-      box-shadow: 0 0 0 1px var(--line), 0 20px 50px -14px rgba(52, 211, 153, .45);
-    }
-    .hero h1 {
-      font-size: clamp(36px, 7vw, 64px); font-weight: 900;
-      line-height: 1; letter-spacing: -0.02em;
-      background: linear-gradient(110deg, #fff 0%, var(--mint) 45%, var(--emerald) 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .hero .sub {
-      margin-top: 22px; font-size: 13px; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--mint);
-    }
-    .hero p.lead {
-      color: var(--muted); font-size: 17px;
-      max-width: 56ch; margin: 18px auto 28px;
-    }
-    .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .badge {
-      display: inline-block; padding: 11px 22px; border-radius: 10px;
-      font-size: 14px; font-weight: 600;
-      border: 1px solid var(--line); color: var(--faint);
-    }
-    a.badge {
-      color: var(--text); border-color: var(--emerald);
-      transition: transform .2s ease;
-    }
-    a.badge:hover { transform: translateY(-2px); }
-
-    .shots {
-      display: flex; gap: 16px; overflow-x: auto;
-      justify-content: safe center;
-      padding: 14px 26px 44px; scroll-snap-type: x mandatory;
-    }
-    .shots::-webkit-scrollbar { height: 0; }
-    .shots img {
-      height: 410px; border-radius: 18px;
-      border: 1px solid var(--line);
-      box-shadow: 0 20px 44px -18px rgba(0, 0, 0, .8);
-      scroll-snap-align: center; flex: 0 0 auto;
-    }
-
-    section.block { padding: 54px 26px; border-top: 1px solid var(--line); }
-    .eyebrow {
-      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--faint);
-    }
-    section.block h2 {
-      font-size: clamp(22px, 3.4vw, 30px); font-weight: 800;
-      margin: 12px 0 28px; letter-spacing: -0.01em;
-    }
-
-    .features { display: grid; gap: 16px; }
-    @media (min-width: 640px) { .features { grid-template-columns: 1fr 1fr; } }
-    .feature {
-      background: var(--panel); border: 1px solid var(--line);
-      border-radius: 15px; padding: 22px;
-      transition: transform .25s var(--ease), border-color .25s var(--ease);
-    }
-    .feature:hover { transform: translateY(-3px); border-color: rgba(52,211,153,.32); }
-    .feature h3 {
-      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--mint); margin-bottom: 11px;
-    }
-    .feature p { color: var(--muted); font-size: 14.5px; }
-    .feature strong { color: var(--text); font-weight: 600; }
-
-    .stats { display: grid; gap: 18px; }
-    @media (min-width: 640px) { .stats { grid-template-columns: repeat(4, 1fr); } }
-    .stat {
-      text-align: center; padding: 26px 14px;
-      border: 1px solid var(--line); border-radius: 14px;
-    }
-    .stat .num {
-      font-size: 30px; font-weight: 800; color: var(--mint);
-      text-shadow: 0 0 18px rgba(52, 211, 153, .35);
-    }
-    .stat .label {
-      margin-top: 8px; font-size: 11px;
-      letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
-    }
-
-    footer {
-      border-top: 1px solid var(--line);
-      padding: 34px 26px 58px; text-align: center;
-      color: var(--muted); font-size: 14px;
-    }
-    footer a { color: var(--emerald); }
-
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .hero { padding: 64px 26px 44px; }
-      .shots img { height: 340px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gambitile — Change shape. Find your way.</title>
+<meta name="description" content="A quiet twist on chess. Become the piece you land on and find your way through 500 puzzles across 25 collections. Play on iOS and Android.">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+<link rel="canonical" href="https://gicklatt.github.io/gambitilegame/">
+<meta property="og:title" content="Gambitile — Chess Morph Puzzle">
+<meta property="og:description" content="Change shape. Find your way. 500 puzzles, 25 collections, and all the time you need.">
+<meta property="og:image" content="assets/screenshots/01-tutorial.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#243f37">
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-  <header id="header">
-    <div class="wrap nav">
-      <a class="brand" href="/">
-        <img src="assets/icon.svg" alt="Gambitile icon" />
-        <span class="name">GAMBITILE</span>
-      </a>
-      <nav class="nav-links">
-        <a href="#how">How it plays</a>
-        <a href="#numbers">Numbers</a>
-        <a href="privacy/">Privacy</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <img class="icon" src="assets/icon.svg" alt="Gambitile icon" />
-      <h1>GAMBITILE</h1>
-      <div class="sub">Chess Morph Puzzle</div>
-      <p class="lead">
-        Become the piece you step on. Tap to move as a rook, step onto a
-        knight tile, and now you move like a knight. Slide, hop, and
-        morph your way through 100 hand-tuned chess-piece puzzles.
-      </p>
-      <div class="badges">
-        <a class="badge" href="https://apps.apple.com/us/app/gambitile/id6771101524" target="_blank" rel="noopener">App Store</a>
-        <a class="badge" href="https://play.google.com/store/apps/details?id=com.gicklatt.gambitile" target="_blank" rel="noopener">Google Play</a>
-      </div>
-    </section>
-
-    <div class="shots">
-      <img src="assets/screenshots/01-tutorial.png" alt="Tutorial" />
-      <img src="assets/screenshots/02-morph.png" alt="Morph mechanic" />
-      <img src="assets/screenshots/03-mid.png" alt="Mid-game puzzle" />
-      <img src="assets/screenshots/04-deep.png" alt="Deeper puzzle" />
-      <img src="assets/screenshots/05-expert.png" alt="Expert puzzle" />
-      <img src="assets/screenshots/06-final.png" alt="Final puzzle" />
-    </div>
-
-    <section id="how" class="block wrap">
-      <div class="eyebrow">How it plays</div>
-      <h2>One clear rule. Every puzzle a question with a knowable answer.</h2>
-      <div class="features">
-        <div class="feature">
-          <h3>Move</h3>
-          <p>Tap any <strong>highlighted square</strong> to move as your current piece — rook, bishop, knight, queen or king.</p>
-        </div>
-        <div class="feature">
-          <h3>Morph</h3>
-          <p>Step onto a <strong>piece-tile</strong> to morph into that piece. The board you stand on rewrites the moves you can make.</p>
-        </div>
-        <div class="feature">
-          <h3>Exit</h3>
-          <p>Reach the <strong>glowing exit</strong> in as few moves as possible. Three-star ranks reward optimal solutions.</p>
-        </div>
-        <div class="feature">
-          <h3>Craft</h3>
-          <p>100 deterministic puzzles, every one <strong>BFS-verified solvable</strong>. No procedural filler — just puzzles.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="numbers" class="block wrap">
-      <div class="eyebrow">By the numbers</div>
-      <h2>Five rising tiers, from warm-ups to 8×8 boards with holes</h2>
-      <div class="stats">
-        <div class="stat"><div class="num">100</div><div class="label">Puzzles</div></div>
-        <div class="stat"><div class="num">5</div><div class="label">Tiers</div></div>
-        <div class="stat"><div class="num">4×4 → 8×8</div><div class="label">Board sizes</div></div>
-        <div class="stat"><div class="num">★★★</div><div class="label">Ranks</div></div>
-      </div>
-    </section>
-
-    <section class="block wrap">
-      <div class="eyebrow">Built for short, satisfying sessions</div>
-      <h2>No timers. No nudges. Plays in portrait, one-handed.</h2>
-      <p style="color:var(--muted); font-size:15.5px; max-width:60ch;">
-        Hint-and-undo jokers are earned by watching optional rewarded
-        videos — never required. A puzzle game in the spirit of
-        classic chess problems, but every piece you become is one you
-        stepped on. The board teaches you.
-      </p>
-    </section>
-  </main>
-
-  <footer>
-    &copy; <span id="year"></span> Gicklatt &middot;
-    <a href="privacy/">Privacy Policy</a> &middot;
-    <a href="mailto:gicklatt@gmail.com">gicklatt@gmail.com</a>
-  </footer>
-
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    var header = document.getElementById("header");
-    var onScroll = function () { header.classList.toggle("scrolled", window.scrollY > 8); };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-  </script>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header"><div class="wrap nav">
+<a href="./" aria-label="Gambitile home"><img class="wordmark" src="assets/brand/logo-forest.svg" width="750" height="180" alt="Gambitile"></a>
+<nav aria-label="Main navigation"><a href="#how">How to play</a><a href="#collection">The puzzles</a><a href="privacy/">Privacy</a></nav>
+</div></header>
+<main id="main">
+<section class="hero wrap">
+<div class="hero-copy">
+<p class="eyebrow">A quiet twist on chess</p>
+<h1>Change shape.<br><span>Find your way.</span></h1>
+<p class="lead">Every piece is a new possibility. Land on one to change how you move, then find your path to the exit.</p>
+<div class="stores" aria-label="Download Gambitile">
+<a class="store" href="https://apps.apple.com/us/app/gambitile/id6771101524" target="_blank" rel="noopener"><span>Download on the</span><strong>App Store</strong></a>
+<a class="store" href="https://play.google.com/store/apps/details?id=com.gicklatt.gambitile" target="_blank" rel="noopener"><span>Get it on</span><strong>Google Play</strong></a>
+</div>
+<p class="hero-note">500 puzzles. No opponent. No timer.</p>
+</div>
+<figure class="hero-game">
+<img src="assets/game/level-076.png" width="1080" height="1920" fetchpriority="high" alt="Level 76, Almost home: a rook explores an irregular chessboard with transformation pieces and a coral exit.">
+<figcaption>One board. More than one way to think.</figcaption>
+</figure>
+</section>
+<div class="facts wrap" aria-label="Game at a glance">
+<p><strong>500</strong><span>puzzles to explore</span></p>
+<p><strong>25</strong><span>collections to discover</span></p>
+<p><strong>Unlimited</strong><span>free undos</span></p>
+</div>
+<section id="how" class="how wrap section">
+<div class="section-heading"><p class="eyebrow">Small moves. Fresh possibilities.</p><h2>The rules change<br>with you.</h2></div>
+<div class="steps">
+<article><span class="step-number">01</span><h3>Make your move.</h3><p>Tap a highlighted tile. Your current piece decides how you travel: straight lines, diagonals, or a knight’s leap.</p></article>
+<article><span class="step-number">02</span><h3>Become something new.</h3><p>Land on a dark piece to take its form. Each transformation can be used only once, so the order matters.</p></article>
+<article><span class="step-number">03</span><h3>Find your way out.</h3><p>Reach the coral exit. Then try a shorter route: three stars reward the most efficient solution.</p></article>
+</div>
+</section>
+<section id="collection" class="collection"><div class="wrap section">
+<div class="collection-heading"><div><p class="eyebrow">Your next little discovery</p><h2>Easy to begin.<br><span>Hard to put down.</span></h2></div><p>Start with guided lessons. Explore 25 collections of increasingly intricate boards. Every one of the 500 puzzles has a verified solution.</p></div>
+<div class="gallery">
+<figure><img src="assets/game/morph-after.png" width="1080" height="1920" loading="lazy" alt="A beginner puzzle after transforming into a bishop, with diagonal moves available."><figcaption><span>01 / Learn</span>A new piece. A new perspective.</figcaption></figure>
+<figure><img src="assets/game/collection.png" width="1080" height="1920" loading="lazy" alt="The first collection shows completed puzzles, earned stars and the next puzzle to explore."><figcaption><span>02 / Explore</span>A collection worth coming back to.</figcaption></figure>
+<figure><img src="assets/game/level-500.png" width="1080" height="1920" loading="lazy" alt="Level 500, A way home, with a complex board of pieces, gaps and an exit."><figcaption><span>03 / Master</span>Make every transformation count.</figcaption></figure>
+</div>
+</div></section>
+<section class="pace wrap section">
+<div><p class="eyebrow">Room to think</p><h2>Try. Undo.<br>Think again.</h2></div>
+<div class="pace-copy"><p>No countdown, no opponent, no rush. Undo is always free and unlimited. Leave a puzzle and return to where you were.</p><p>The puzzles work offline. Hints can help when you need a nudge; optional rewarded ads offer extra hints when available. Occasional ads appear between completed puzzles.</p><p class="small">Available in English and Turkish. Made for portrait play on your phone.</p></div>
+</section>
+</main>
+<footer class="footer"><div class="wrap footer-inner"><a href="./" aria-label="Gambitile home"><img class="wordmark" src="assets/brand/logo-ivory.svg" width="750" height="180" alt="Gambitile"></a><p>A puzzle game by Gicklatt.</p><nav aria-label="Footer"><a href="privacy/">Privacy policy</a><a href="mailto:gicklatt@gmail.com">Contact</a></nav></div></footer>
 </body>
 </html>
